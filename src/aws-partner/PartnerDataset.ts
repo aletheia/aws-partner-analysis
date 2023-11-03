@@ -1,5 +1,4 @@
 import ObjectsToCsv = require('objects-to-csv');
-import {Set} from 'typescript';
 import {Partner} from '.';
 import {Logger} from '../Logger';
 
