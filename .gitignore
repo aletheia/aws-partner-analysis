@@ -18,3 +18,5 @@ node_modules
 !.gitlab-ci-template.yml.example
 
 log.log
+build/
+data/
