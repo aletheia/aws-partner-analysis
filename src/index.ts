@@ -2,10 +2,11 @@ import {writeFileSync} from 'fs';
 import ObjectsToCsv = require('objects-to-csv');
 import {join} from 'path';
 import {Logger} from './Logger';
-import {PartnerPortal} from './aws-partner';
+import {Partner, PartnerPortal} from './aws-partner';
 import {Cache} from './cache';
 import {CreditSafe} from './creditsafe';
 import {config} from 'dotenv';
+import {PartnerDataset} from './aws-partner/PartnerDataset';
 
 const DATA_FOLDER = './data';
 
@@ -34,32 +35,80 @@ const DATA_FOLDER = './data';
     cache
   );
 
-  const {CREDITSAFE_USERNAME: username, CREDITSAFE_PASSWORD: password} =
-    process.env;
+  const plist = await partnerPortal.fetchPartnerList(
+    tier,
+    type,
+    country,
+    maxResults
+  );
 
-  if (username && password) {
-    const creditSafe = new CreditSafe(
-      {
-        username,
-        password,
-      },
-      logger,
-      cache
-    );
-    const token = await creditSafe.getAuthToken();
-    console.log(token);
-  }
-  // const list = await partnerPortal.fetchPartners(
-  //   tier,
-  //   type,
-  //   country,
-  //   maxResults
-  // );
+  const partners: Partner[] = await partnerPortal.fetchPartners(
+    tier,
+    type,
+    country,
+    maxResults
+  );
 
-  // logger.log(`Found ${list.length} partners`);
+  const refiners: string[] = await partnerPortal.getRefiners(
+    tier,
+    type,
+    country,
+    maxResults
+  );
 
-  // const csv = new ObjectsToCsv(list);
-  // await csv.toDisk(join('./data', 'partners.csv'));
+  const partnerDataset = new PartnerDataset(partners, refiners, logger);
+
+  writeFileSync(
+    join(DATA_FOLDER, 'partners.csv'),
+    await partnerDataset.dataset_partners()
+  );
+
+  writeFileSync(
+    join(DATA_FOLDER, 'refiners.csv'),
+    await partnerDataset.dataset_refiners()
+  );
+
+  writeFileSync(
+    join(DATA_FOLDER, 'partner_numbers.csv'),
+    await partnerDataset.dataset_partners()
+  );
+
+  writeFileSync(
+    join(DATA_FOLDER, 'dataset_technologies.csv'),
+    await partnerDataset.datasetTechnologies()
+  );
+
+  writeFileSync(
+    join(DATA_FOLDER, 'dataset_qualifications.csv'),
+    await partnerDataset.datasetQualifications()
+  );
+
+  writeFileSync(
+    join(DATA_FOLDER, 'dataset_competencies.csv'),
+    await partnerDataset.datasetCompetencies()
+  );
+
+  writeFileSync(
+    join(DATA_FOLDER, 'dataset_industries.csv'),
+    await partnerDataset.datasetIndustries()
+  );
+
+  writeFileSync(
+    join(DATA_FOLDER, 'dataset_partner_programs.csv'),
+    await partnerDataset.datasetPartnerPrograms()
+  );
+
+  writeFileSync(
+    join(DATA_FOLDER, 'dataset_professional_services.csv'),
+    await partnerDataset.datasetProfessionalServices()
+  );
+
+  writeFileSync(
+    join(DATA_FOLDER, 'dataset_programs.csv'),
+    await partnerDataset.datasetPrograms()
+  );
+
+  // await csv.toDisk(join('./data', 'refiners.csv'));
 
   // writeFileSync(join('data', 'partner.json'), JSON.stringify(list, null, 4));
 })();

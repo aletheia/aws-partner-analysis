@@ -33,8 +33,11 @@ export interface Address {
   street: string;
   postalcode: string;
 }
-
-export interface Partner {
+interface IDictionary<TValue> {
+  [id: string]: TValue;
+}
+export interface Partner
+  extends IDictionary<string | string[] | number | Date | object | undefined> {
   id: string;
   name: string;
   type: string;
@@ -70,7 +73,8 @@ export interface Partner {
     contract_names: string[];
   };
   aws_services_membership: string[];
-  certifications: string[];
+  qualifications: string[];
+  certified_individuals: number;
   use_cases: string[];
   credit_status?: {
     score: number;

@@ -104,7 +104,8 @@ export class PartnerPortal {
       },
       programs: partner.program_membership,
       offices: partner.office_address,
-      certifications: partner.aws_certifications,
+      qualifications: partner.aws_certifications,
+      certified_individuals: partner.aws_certifications_count,
       use_cases: partner.use_case_expertise,
       aws_services_membership: partner.service_membership,
     };
